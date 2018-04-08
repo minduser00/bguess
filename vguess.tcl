@@ -23,7 +23,7 @@
 set bgdir [file dirname [info script]]
 
 #-------------------------------------------------------------------------------
-# Files
+# Archivos
 #-------------------------------------------------------------------------------
 set bguess(file) [file join $bgdir "bguess.db"]
 set bgstats(file) [file join $bgdir "bgstats.db"]
@@ -32,17 +32,17 @@ set bgtarget(file) [file join $bgdir "bgtarget.db"]
 #set bgtarget(web) [file join $bgdir "web/bgtarget.db"]
 
 #-------------------------------------------------------------------------------
-# Game Channel
+# Canal del juego
 #-------------------------------------------------------------------------------
 set bguess(chan) "#pruebas"
 
 #-------------------------------------------------------------------------------
-# Banned Nicks
+# Nicks betados
 #-------------------------------------------------------------------------------
 set bguess(banned_nicks) { [Minerva] }
 
 #-------------------------------------------------------------------------------
-# Tiempo entre intentos (segundos)
+# Tiempo entre intentos (en segundos)
 #-------------------------------------------------------------------------------
 set bguess(period) 180
 
@@ -53,7 +53,7 @@ set bguess(period) 180
 set bguess(preservetime) [expr {60 * 60 * 24 * 30 * 6}]
 
 #-------------------------------------------------------------------------------
-# Tiempo para borrar la puntuacio maxima
+# Tiempo para borrar la puntuacion maxima
 # en segundos ( segundos * minutos * horas * dias ).
 #-------------------------------------------------------------------------------
 set bguess(cleartime) [expr {60 * 60 * 24 * 4}]
@@ -77,13 +77,13 @@ set bguess(cmdrange) "!vgrange"
 set bguess(cmdstats) "!vgstats"
 
 #===============================================================================
-# DO NOT ALTER ANYTHING BELOW HERE
+# NO MODIFICAR NADA A PARTIR DE ESTA LINEA
 #===============================================================================
 
 #-------------------------------------------------------------------------------
 # Control de version
 #-------------------------------------------------------------------------------
-set bgversion "3.8"; set bgrelease "BETA3";
+set bgversion "3.8"; set bgrelease "BETA4";
 
 #-------------------------------------------------------------------------------
 # Caracteres de contol de colores.
@@ -233,17 +233,17 @@ proc vgsearch {lista buscado indice} {
 }
 
 #--------------------------------------------------------------------------------
-# Update Player Stats
+# Actualiza las estadisticas del jugador
 #--------------------------------------------------------------------------------
 proc player_stats_update {nick win score} {
 	global bgstats
 	set found [vgsearch $bgstats(records) $nick 0]
 	if {$found >= 0} {
-		# Nick está en las estadísticas, actualizamos su registro.
+		# El jugador está en las estadísticas, actualizamos su ficha.
 		set ficha [lindex $bgstats(records) $found]
 		set bgstats(records) [lreplace $bgstats(records) $found $found "$nick [expr {[lindex $ficha 1] + 1}] [expr {[lindex $ficha 2] + $win}] [expr {[lindex $ficha 3] + $score}] [unixtime]"]
 	} else {
-		# Nick no está en la lista, metemos un registro nuevo.
+		# El jugador no está en la lista, creamos una ficha nueva.
 		lappend bgstats(records) "$nick 1 $win $score [unixtime]"
 		incr bgstats(count)
 		# Y ordenamos la lista por orden alfabético.
@@ -254,7 +254,7 @@ proc player_stats_update {nick win score} {
 }
 
 #--------------------------------------------------------------------------------
-# Update Target Stats
+# Actualiza las estadisticas de los números
 #--------------------------------------------------------------------------------
 proc target_stats_update {target win} {
 	global bgtarget
@@ -274,7 +274,7 @@ proc target_stats_update {target win} {
 }
 
 #--------------------------------------------------------------------------------
-# Display Stats Nick
+# Muestra las estadisticas de un jugador
 #--------------------------------------------------------------------------------
 proc display_s_nick { chan args } {
 	global bgstats b n az v rj m
@@ -302,7 +302,7 @@ proc display_s_nick { chan args } {
 }
 
 #--------------------------------------------------------------------------------
-# Display Stats Range
+# Muestra un rango de las estadisticas
 #--------------------------------------------------------------------------------
 proc display_s_range { chan nick tipo text } {
 	global bgstats bgtarget bgmaxrange b n az v rj m l
@@ -368,7 +368,7 @@ proc display_s_range { chan nick tipo text } {
 }
 
 #--------------------------------------------------------------------------------
-# Display Stats Percent
+# Muestra porcentages de estadisticas
 #--------------------------------------------------------------------------------
 proc cmd_comp {a b} {
 	# aciertos * 100 / intentos
@@ -380,7 +380,7 @@ proc cmd_comp {a b} {
 }
 
 #--------------------------------------------------------------------------------
-# Display Stats
+# Selecciona tipos de estadisticas
 #--------------------------------------------------------------------------------
 proc bguess_stats {nick uhost hand chan text} {
 	set arg1 [lindex $text 1]
@@ -418,7 +418,7 @@ proc bguess_stats {nick uhost hand chan text} {
 }
 
 #--------------------------------------------------------------------------------
-# Display Range
+# Muestra un rango
 #--------------------------------------------------------------------------------
 proc bguess_range {nick uhost hand chan text} {
 	global bguess b v m l msgduck
@@ -436,11 +436,11 @@ proc bguess_range {nick uhost hand chan text} {
 }
 
 #--------------------------------------------------------------------------------
-# Display Web Page - Display the web page on the bguess channel
+# Publicita la pagina web - Muestra la pagina web en el canal del bguess
 #--------------------------------------------------------------------------------
 proc bguess_web {nick uhost hand chan text} {
 	global bgstats bgtarget
-	puthelp "PRIVMSG $chan :\001ACTION -> $nick - http://kevin.com.au/thinker/ - Thinker's bguess web pages.\001"
+	puthelp "PRIVMSG $chan :\001ACTION -> $nick - http://unapagina.z - Pagina del beguess.\001"
 	return
 }
 
@@ -456,7 +456,7 @@ proc check_duck {chan bghi bglo} {
 }
 
 #--------------------------------------------------------------------------------
-# Play the game
+# Ejecución del juego
 #--------------------------------------------------------------------------------
 proc bguess_play {nick uhost hand chan text} {
 	global bguess bghosts bgstats bgtarget b n az v rj m l msgduck
