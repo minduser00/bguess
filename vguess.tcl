@@ -14,7 +14,7 @@
 # http://www.gnu.org/copyleft/gpl.html
 #
 #===============================================================================
-# USER SETTINGS
+# AJUSTES DEL USUARIO
 #===============================================================================
 
 #  Obtiene la ruta al directorio donde reside nuestro script
