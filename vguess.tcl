@@ -487,6 +487,9 @@ proc bguess_play {nick uhost hand chan text} {
 	} else {
 		# Si hemos llegado aqui, el intento es válido, incrementamos el contador de intentos.
 		incr bguess(intentos) 1
+		# Limpiamos el tiempo entre intentos
+		unset bghosts
+		global bghosts
 		# ¿Cómo es la respuesta?
 		if {$text == $bguess(target)} {
 			# La respuesta es correcta.
@@ -523,9 +526,6 @@ proc bguess_play {nick uhost hand chan text} {
 			set bguess(low) 0
 			set bguess(high) 99
 			set bguess(last_winner) $nick
-			# Limpiando vghosts
-			unset bghosts
-			global bghosts
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
@@ -543,9 +543,7 @@ proc bguess_play {nick uhost hand chan text} {
 			player_stats_update $nick 0 0
 			target_stats_update $text 0
 			check_duck $chan $bguess(high) $bguess(low)
-			#actualiza el timer para este usuario borra los demas
-			unset bghosts
-			global bghosts
+			#actualiza el timer para este usuario
 			set bghosts($uhost) [unixtime]
 		}
 		# Guarda el timer.
