@@ -488,7 +488,7 @@ proc bguess_play {nick uhost hand chan text} {
 		# Si hemos llegado aqui, el intento es válido, incrementamos el contador de intentos.
 		incr bguess(intentos) 1
 		# Limpiamos el tiempo entre intentos
-		unset bghosts
+		unset -nocomplain bghosts
 		global bghosts
 		# ¿Cómo es la respuesta?
 		if {$text == $bguess(target)} {
