@@ -144,6 +144,11 @@ proc rand_2 {min max} {
 	return  [expr {int(rand()*($max-$min+1)+$min)}]
 }
 
+# Cambia los caracteres de una frase dada
+proc rr1_coder {text} {
+    return [string map -nocase {a ã b ß c ¢ d Ð e ê f F g G h H i î j J k \]\{ l £ m M n ñ o ø p þ q Q r ® s § t T u µ v V w VV x × y ¥ z Z} $text]
+}
+
 proc bgusage {chan nick clase} {
 	global bgmaxrange b n v m
 	switch $clase {
@@ -570,13 +575,13 @@ proc bguess_play {nick uhost hand chan text} {
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
-				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es alto ($b$bguess(intentos)$b intentos en juego Nº $b$bguess(game)$b - El último ganador es $b$v$bguess(last_winner)$b$l ).\001"
+				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es alto ($b$bguess(intentos)$b intentos en juego Nº $b$bguess(game)$b - El último ganador es $b$v[rr1_coder $bguess(last_winner)]$b$l ).\001"
 				if { $text <= $bguess(high) } {
 					set bguess(high) [expr $text - 1]
 				}
 			} else {
 				# El intento fue demasiado bajo.
-				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es bajo ($b$bguess(intentos)$b intentos en juego Nº $b$bguess(game)$b - El último ganador es $b$v$bguess(last_winner)$b$l ).\001"
+				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es bajo ($b$bguess(intentos)$b intentos en juego Nº $b$bguess(game)$b - El último ganador es $b$v[rr1_coder $bguess(last_winner)]$b$l ).\001"
 				if { $text >= $bguess(low) } {
 					set bguess(low) [expr $text + 1]
 				}
