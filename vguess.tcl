@@ -489,7 +489,7 @@ proc bgnext {nick} {
 # Check for ducks
 #--------------------------------------------------------------------------------
 proc check_duck {chan nick bghi bglo} {
-	global b msgduck
+	global b bgduck_granted msgduck
 	if { $bghi == $bglo } {
 		set msgd [lindex $msgduck [rand [llength $msgduck]]]
 		puthelp "PRIVMSG $chan :\001ACTION -> $b$chan$b -> $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd\001"
