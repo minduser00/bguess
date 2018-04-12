@@ -468,7 +468,7 @@ proc bguess_web {nick uhost hand chan text} {
 proc bgnext {} {
 	global bguess
 	incr bguess(game) 1
-	set bguess(target) [rand 100]
+	set bguess(target) [expr {$bglow_num + [rand [expr {$bghigh_num + 1 - $bglow_num}]]}]
 	set bguess(intentos) 0
 	set bguess(low) $bglow_num
 	set bguess(high) $bghigh_hum
@@ -517,9 +517,9 @@ proc bguess_play {nick uhost hand chan text} {
 	} elseif { ![string is int $text] } {
 		# El número tiene que ser un entero.
 		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess$b$m debe ser una combinación de dígitos ($v$b[]0$b$m...$v$b[]9$b$m).$b$n $text$b$m no es válido."
-	} elseif { $text < 0 || $text > 99 } {
-		# Tiene que ser un número entre 0 y 99.
-		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess $b$m[]debe ser un número entre el$b$v 0 $b$m[]y el$b$v 99$b$m."
+	} elseif { $text < $bglow_num || $text > $bghigh_num } {
+		# Tiene que ser un número entre $bglow_num y $bghigh_num.
+		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess $b$m[]debe ser un número entre el$b$v 0 $bglow_num $b$m[]y el$b$v $bghigh_num$b$m."
 	} elseif { [expr {[unixtime] - $t}] < $bguess(period) } {
 		# 1 intento cada $bguess(period) segundos.
 		puthelp "NOTICE $nick :$m-> Sólo un intento cada$b$az [expr {$bguess(period) / 60}] $b$m[]minutos :)."
