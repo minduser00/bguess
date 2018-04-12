@@ -470,8 +470,8 @@ proc bguess_web {nick uhost hand chan text} {
 #--------------------------------------------------------------------------------
 # Inicia el siguiente juego
 #--------------------------------------------------------------------------------
-proc bgnext {} {
-	global bguess bglow_num bghigh_num nick
+proc bgnext {nick} {
+	global bguess bglow_num bghigh_num
 	incr bguess(game) 1
 	set bguess(target)  [rand_2 $bglow_num $bghigh_num]
 	set bguess(intentos) 0
@@ -483,7 +483,7 @@ proc bgnext {} {
 #--------------------------------------------------------------------------------
 # Check for ducks
 #--------------------------------------------------------------------------------
-proc check_duck {chan bghi bglo} {
+proc check_duck {chan nick bghi bglo} {
 	global b msgduck
 	if { $bghi == $bglo } {
 		set msgd [lindex $msgduck [rand [llength $msgduck]]]
@@ -492,7 +492,7 @@ proc check_duck {chan bghi bglo} {
 		# Se ha seleccionado no permitir jugar el ultimo número ?
 		if { !$bgduck_granted } {
 			# Pasamos al siguiente juego
-			bgnext
+			bgnext $nick
 			# Para hacer: guardar punto en el bote, ¿ enviar mensaje ?
 			#if { $bg_bote_on } {
 			
@@ -566,7 +566,7 @@ proc bguess_play {nick uhost hand chan text} {
 				set bguess(max_one_game) $bguess(game)
 				set bguess(max_one_time) [unixtime]
 			}
-			bgnext
+			bgnext $nick
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
