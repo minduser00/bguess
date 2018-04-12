@@ -524,7 +524,7 @@ proc bguess_play {nick uhost hand chan text} {
 		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess$b$m debe ser una combinación de dígitos ($v$b[]0$b$m...$v$b[]9$b$m).$b$n $text$b$m no es válido."
 	} elseif { $text < $bglow_num || $text > $bghigh_num } {
 		# Tiene que ser un número entre $bglow_num y $bghigh_num.
-		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess $b$m[]debe ser un número entre el$b$v 0 $bglow_num $b$m[]y el$b$v $bghigh_num$b$m."
+		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess $b$m[]debe ser un número entre el$b$v $bglow_num $b$m[]y el$b$v $bghigh_num$b$m."
 	} elseif { [expr {[unixtime] - $t}] < $bguess(period) } {
 		# 1 intento cada $bguess(period) segundos.
 		puthelp "NOTICE $nick :$m-> Sólo un intento cada$b$az [expr {$bguess(period) / 60}] $b$m[]minutos :)."
@@ -583,7 +583,7 @@ proc bguess_play {nick uhost hand chan text} {
 			}
 			player_stats_update $nick 0 0
 			target_stats_update $text 0
-			check_duck $chan $bguess(high) $bguess(low)
+			check_duck $chan $nick $bguess(high) $bguess(low)
 			#actualiza el timer para este usuario
 			set bghosts($uhost) [unixtime]
 		}
