@@ -42,6 +42,24 @@ set bguess(chan) "#pruebas"
 set bguess(banned_nicks) { [Minerva] }
 
 #-------------------------------------------------------------------------------
+# selecciona los limites inferior y superior de los numeros del juego
+#-------------------------------------------------------------------------------
+set bglow_num 0
+set bghigh_num 99
+
+#-------------------------------------------------------------------------------
+# Esta permitido jugar cuando solo quede un numero ?
+# 		true = si	-	false = no
+#-------------------------------------------------------------------------------
+set bgduck_granted true
+
+#-------------------------------------------------------------------------------
+# Si no se permite jugar al ultimo número, se guarga el punto en el bote ?
+# 		true = si	-	false = no
+#-------------------------------------------------------------------------------
+#set bg_bote_on false     #-> NOT IMPLEMENTED YET
+
+#-------------------------------------------------------------------------------
 # Tiempo entre intentos (en segundos)
 #-------------------------------------------------------------------------------
 set bguess(period) 180
@@ -156,8 +174,8 @@ proc bguess_load {} {
 		set bguess(game) 1
 		set bguess(target) [rand 100]
 		set bguess(intentos) 0
-		set bguess(low) 0
-		set bguess(high) 99
+		set bguess(low) $bglow_num
+		set bguess(high) $bghigh_num
 		set bguess(last_winner) "Por Descubrir :P"
 		set bguess(max_one_winner) "Nadie :o)"
 		set bguess(max_one_points) 0
@@ -445,13 +463,36 @@ proc bguess_web {nick uhost hand chan text} {
 }
 
 #--------------------------------------------------------------------------------
+# Inicia el siguiente juego
+#--------------------------------------------------------------------------------
+proc bgnext {} {
+	global bguess
+	incr bguess(game) 1
+	set bguess(target) [rand 100]
+	set bguess(intentos) 0
+	set bguess(low) $bglow_num
+	set bguess(high) $bghigh_hum
+	set bguess(last_winner) $nick
+}
+
+#--------------------------------------------------------------------------------
 # Check for ducks
 #--------------------------------------------------------------------------------
 proc check_duck {chan bghi bglo} {
 	global b msgduck
-	set msgd [lindex $msgduck [rand [llength $msgduck]]]
 	if { $bghi == $bglo } {
+		set msgd [lindex $msgduck [rand [llength $msgduck]]]
 		puthelp "PRIVMSG $chan :\001ACTION -> $b$chan$b -> $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd\001"
+		
+		# Se ha seleccionado no permitir jugar el ultimo número ?
+		if { !$bgduck_granted } {
+			# Pasamos al siguiente juego
+			bgnext
+			# Para hacer: guardar punto en el bote, ¿ enviar mensaje ?
+			#if { $bg_bote_on } {
+			
+			#}
+		}
 	}
 }
 
@@ -520,12 +561,7 @@ proc bguess_play {nick uhost hand chan text} {
 				set bguess(max_one_game) $bguess(game)
 				set bguess(max_one_time) [unixtime]
 			}
-			incr bguess(game) 1
-			set bguess(target) [rand 100]
-			set bguess(intentos) 0
-			set bguess(low) 0
-			set bguess(high) 99
-			set bguess(last_winner) $nick
+			bgnext
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
