@@ -139,6 +139,11 @@ bind time - "00 01 *" bguess_cleaning
 # Procedures
 #--------------------------------------------------------------------------------
 
+# genera numeros aleatorios entre dos limites dados
+proc rand_2 {min max} {
+	return  [expr {int(rand()*($max-$min+1)+$min)}]
+}
+
 proc bgusage {chan nick clase} {
 	global bgmaxrange b n v m
 	switch $clase {
@@ -156,7 +161,7 @@ proc bgusage {chan nick clase} {
 }
 
 proc bguess_load {} {
-	global bguess
+	global bguess bglow_num bghigh_num
 	if {[file exists $bguess(file)]&&[file size $bguess(file)]>6} {
 		set _bguess [open $bguess(file) r]
 		gets $_bguess bguess(game)
@@ -172,7 +177,7 @@ proc bguess_load {} {
 		close $_bguess
 	} else {
 		set bguess(game) 1
-		set bguess(target) [rand 100]
+		set bguess(target) [rand_2 $bglow_num $bghigh_num]
 		set bguess(intentos) 0
 		set bguess(low) $bglow_num
 		set bguess(high) $bghigh_num
@@ -466,9 +471,9 @@ proc bguess_web {nick uhost hand chan text} {
 # Inicia el siguiente juego
 #--------------------------------------------------------------------------------
 proc bgnext {} {
-	global bguess
+	global bguess bglow_num bghigh_num nick
 	incr bguess(game) 1
-	set bguess(target) [expr {$bglow_num + [rand [expr {$bghigh_num + 1 - $bglow_num}]]}]
+	set bguess(target)  [rand_2 $bglow_num $bghigh_num]
 	set bguess(intentos) 0
 	set bguess(low) $bglow_num
 	set bguess(high) $bghigh_hum
@@ -500,7 +505,7 @@ proc check_duck {chan bghi bglo} {
 # Ejecución del juego
 #--------------------------------------------------------------------------------
 proc bguess_play {nick uhost hand chan text} {
-	global bguess bghosts bgstats bgtarget b n az v rj m l msgduck
+	global bguess bghosts bglow_num bghigh_num bgstats bgtarget b n az v rj m l msgduck
 	# Ignora todo excepto la primera parte del texto después del comando !vguess.
 	set text [lindex [split $text] 1]
 	# Establece el tiempo de la última respuesta para éste jugador.
