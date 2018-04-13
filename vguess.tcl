@@ -57,7 +57,7 @@ set bgduck_granted true
 # Si no se permite jugar al ultimo número, se guarga el punto en el bote ?
 # 		true = si	-	false = no
 #-------------------------------------------------------------------------------
-set bgcan_on false
+set bgcan_on true
 
 #-------------------------------------------------------------------------------
 # Número de aciertos consecutivos para llevarse el bote
