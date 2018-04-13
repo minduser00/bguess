@@ -467,7 +467,7 @@ proc bguess_range {nick uhost hand chan text} {
 	} else {
 		set mensaje "PRIVMSG $chan :\001ACTION $m-> $b$l$nick$b $m- Juego Nº$b$v $bguess(game) $b$m- Un número entre$b$l $bguess(low)$b$m y$b$l $bguess(high)$b$m - Puntos:$b$l [ expr $bguess(high) - $bguess(low) + 1 ]$b$m."
 		if {$bguess(max_one_points) != 0} {
-			set mensaje "$mensaje $m[]La puntuación más alta fue conseguida por$b$l $bguess(max_one_winner)$b$m, con$b$l $bguess(max_one_points)$b$m puntos en el juego Nº$b$l $bguess(max_one_game)$b$m."
+			set mensaje "$mensaje $m[]La puntuación más alta fue conseguida por$b$l [rr1_coder $bguess(max_one_winner)]$b$m, con$b$l $bguess(max_one_points)$b$m puntos en el juego Nº$b$l $bguess(max_one_game)$b$m."
 		}
 		puthelp "$mensaje\001"
 	}
@@ -527,7 +527,7 @@ proc check_duck {chan nick bghi bglo} {
 #--------------------------------------------------------------------------------
 proc bgcan {nick} {
 	global bgcan_on bgduck_granted bgrow_can bguess
-	if {!$bgduck_granted and $bgcan_on} {
+	if {!$bgduck_granted && $bgcan_on} {
 		if {$bguess(can) > 0} {
 			if {$bguess(last_winner) == $nick} {
 				# El ultimo ganador repite acierto
