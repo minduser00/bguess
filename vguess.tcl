@@ -532,11 +532,12 @@ proc check_duck {chan nick bghi bglo} {
 				# El bote está activado, sumamos un punto o lo iniciamos
 				incr bguess(can) $bgcan_increase
 				if {bguess(can) == 1} {
-					set msg "Primer[if {$bgcan_increase > 1} {"s $bgcan_increase"}] punto[if {$bgcan_increase > 1} {"s"}] para el bote"
+					set msg "Primer[if {$bgcan_increase > 1} {"os $bgcan_increase"}] punto[if {$bgcan_increase > 1} {"s"}] para el bote"
 				} else {
-					set msg "Se añade[if {$bgcan_increase > 1} {"n"}]$b 1$b punto[if {$bgcan_increase > 1} {"s"}] al bote. Hay$b $bguess(can)$b puntos acumulados"
+					set msg "Se añade[if {$bgcan_increase > 1} {"n"}]$b $bgcan_increase$b punto[if {$bgcan_increase > 1} {"s"}] al bote. Hay$b $bguess(can)$b puntos acumulados"
 				}
 				puthelp "PRIVMSG $chan :\001ACTION -> $msg.\001"
+			}
 		} else {
 			# Se permite jugar el ultimo número
 		}
