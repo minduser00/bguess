@@ -537,7 +537,10 @@ proc check_duck {chan nick bghi bglo} {
 					set msg "Se añade[if {$bgcan_increase > 1} {"n"}]$b $bgcan_increase$b punto[if {$bgcan_increase > 1} {"s"}] al bote. Hay$b $bguess(can)$b puntos acumulados"
 				}
 				puthelp "PRIVMSG $chan :\001ACTION -> $msg.\001"
+			} else {
+				puthelp "PRIVMSG $chan :\001ACTION -> Punto perdido :-P \001"
 			}
+			#Pasamos al siguiente juego.
 			bgnext $nick
 		} else {
 			# Se permite jugar el ultimo número
