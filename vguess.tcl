@@ -65,6 +65,11 @@ set bgcan_on true
 set bgrow_can 5
 
 #-------------------------------------------------------------------------------
+# Puntos a sumar al bote
+#-------------------------------------------------------------------------------
+set bgcan_increase 1
+
+#-------------------------------------------------------------------------------
 # Tiempo entre intentos (en segundos)
 #-------------------------------------------------------------------------------
 set bguess(period) 180
@@ -516,22 +521,22 @@ proc bgnext {nick {win false}} {
 # Check for ducks
 #--------------------------------------------------------------------------------
 proc check_duck {chan nick bghi bglo} {
-	global b bgcan_on bgduck_granted bguess msgduck 
+	global b bgcan_on bgcan_increase bgduck_granted bguess msgduck 
 	if { $bghi == $bglo } {
 		set msgd [lindex $msgduck [rand [llength $msgduck]]]
 		puthelp "PRIVMSG $chan :\001ACTION -> $b$chan$b -> $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd\001"
 		
-		# Se ha seleccionado no permitir jugar el ultimo número ?
 		if { !$bgduck_granted } {
-			# Sumamos un punto al bote, si se ha activado en los ajustes
+			# No se permite jugar el ultimo número
 			if { $bgcan_on } {
-				# ¿ enviar mensaje ?
-				incr bguess(can)
-			} else {
-				# Se seleccionó no activar bote
-			}
-			# Pasamos al siguiente juego
-			bgnext $nick
+				# El bote está activado, sumamos un punto o lo iniciamos
+				incr bguess(can) $bgcan_increase
+				if {bguess(can) == 1} {
+					set msg "Primer[if {$bgcan_increase > 1} {"s $bgcan_increase"}] punto[if {$bgcan_increase > 1} {"s"}] para el bote"
+				} else {
+					set msg "Se añade[if {$bgcan_increase > 1} {"n"}]$b 1$b punto[if {$bgcan_increase > 1} {"s"}] al bote. Hay$b $bguess(can)$b puntos acumulados"
+				}
+				puthelp "PRIVMSG $chan :\001ACTION -> $msg.\001"
 		} else {
 			# Se permite jugar el ultimo número
 		}
