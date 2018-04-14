@@ -51,7 +51,7 @@ set bghigh_num 99
 # Esta permitido jugar cuando solo quede un numero ?
 # 		true = si	-	false = no
 #-------------------------------------------------------------------------------
-set bgduck_granted true
+set bgduck_granted false
 
 #-------------------------------------------------------------------------------
 # Si no se permite jugar al ultimo número, se guarga el punto en el bote ?
@@ -106,7 +106,7 @@ set bguess(cmdstats) "!vgstats"
 #-------------------------------------------------------------------------------
 # Control de version
 #-------------------------------------------------------------------------------
-set bgversion "3.8"; set bgrelease "BETA4";
+set bgversion "3.9"; set bgrelease "BETA1";
 
 #-------------------------------------------------------------------------------
 # Caracteres de contol de colores.
@@ -486,14 +486,16 @@ proc bguess_web {nick uhost hand chan text} {
 #--------------------------------------------------------------------------------
 # Inicia el siguiente juego
 #--------------------------------------------------------------------------------
-proc bgnext {nick} {
+proc bgnext {nick {win false}} {
 	global bguess bglow_num bghigh_num
 	incr bguess(game) 1
 	set bguess(target)  [rand_2 $bglow_num $bghigh_num]
 	set bguess(intentos) 0
 	set bguess(low) $bglow_num
-	set bguess(high) $bghigh_hum
-	set bguess(last_winner) $nick
+	set bguess(high) $bghigh_num
+	if {$win} {
+		set bguess(last_winner) $nick
+	}
 }
 
 #--------------------------------------------------------------------------------
@@ -525,11 +527,12 @@ proc check_duck {chan nick bghi bglo} {
 #--------------------------------------------------------------------------------
 # Manejo del bote
 #--------------------------------------------------------------------------------
-proc bgcan {nick} {
+proc bgcan {chan nick} {
 	global bgcan_on bgduck_granted bgrow_can bguess
-	if {!$bgduck_granted && $bgcan_on} {
-		if {$bguess(can) > 0} {
-			if {$bguess(last_winner) == $nick} {
+	global b n m
+	if {!$bgduck_granted} {
+		if {$bgcan_on && $bguess(can) > 0} {
+			if {[string equal -nocase $bguess(last_winner) $nick]} {
 				# El ultimo ganador repite acierto
 				incr bguess(in_a_row)
 				if {$bguess(in_a_row) >= $bgrow_can} {
@@ -538,9 +541,9 @@ proc bgcan {nick} {
 					player_stats_update $nick 0 0 $bguess(can)
 					set bguess(in_a_row) 0
 					set bguess(can) 0
-				} elseif {$bguess(in_a_row) == [expr {$bgrow_can - 1}]} {
+				} elseif {$bguess(in_a_row) == [expr $bgrow_can - 1]} {
 					# Un acierto mas y nick se lleva el bote
-					puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Un acierto mas y el bote de $bguess(can) es tuyo.\001"
+					puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Un acierto mas y el bote de $bguess(can) puntos es tuyo.\001"
 				}
 			} else {
 				set bguess(in_a_row) 1
@@ -614,8 +617,8 @@ proc bguess_play {nick uhost hand chan text} {
 				set bguess(max_one_game) $bguess(game)
 				set bguess(max_one_time) [unixtime]
 			}
-			bgnext $nick
-			bgcan $nick
+			bgcan $chan $nick
+			bgnext $nick true
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
