@@ -531,7 +531,7 @@ proc check_duck {chan nick bghi bglo} {
 			if { $bgcan_on } {
 				# El bote está activado, sumamos un punto o lo iniciamos
 				incr bguess(can) $bgcan_increase
-				if {bguess(can) == 1} {
+				if {$bguess(can) == $bgcan_increase} {
 					set msg "Primer[if {$bgcan_increase > 1} {"os $bgcan_increase"}] punto[if {$bgcan_increase > 1} {"s"}] para el bote"
 				} else {
 					set msg "Se añade[if {$bgcan_increase > 1} {"n"}]$b $bgcan_increase$b punto[if {$bgcan_increase > 1} {"s"}] al bote. Hay$b $bguess(can)$b puntos acumulados"
