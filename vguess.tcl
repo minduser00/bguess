@@ -272,6 +272,20 @@ proc vgsearch {lista buscado indice} {
 }
 
 #--------------------------------------------------------------------------------
+# Retorna la puntuación de un jugador dado
+#--------------------------------------------------------------------------------
+proc bgpuntos {nick} {
+	global bgstats
+	set found [vgsearch $bgstats(records) $nick 0]
+	if {$found >= 0} {
+		set ficha [lindex $bgstats(records) $found]
+		return [lindex $ficha 3]
+	} else {
+		return 0
+	}
+}
+
+#--------------------------------------------------------------------------------
 # Actualiza las estadisticas del jugador
 #--------------------------------------------------------------------------------
 proc player_stats_update {nick {try 0} {win 0} {score 0}} {
@@ -591,7 +605,7 @@ proc bguess_play {nick uhost hand chan text} {
 		if {$text == $bguess(target)} {
 			# La respuesta es correcta.
 			set puntos [expr {$bguess(high) - $bguess(low) + 1}]
-			set mensaje "PRIVMSG $chan :\001ACTION -> $b$nick$b - El $b[]$text$b es el correcto! ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - $b[]$puntos$b puntos"
+			set mensaje "PRIVMSG $chan :\001ACTION -> $b$nick$b - El $b[]$text$b es el correcto! ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - $b[]$puntos$b puntos. Total ganados [expr {[bgpuntos $nick] + $puntos}]"
 			if {![isvoice $nick $chan]} {
 				puthelp "$mensaje$l)$m. - Tómate una rubia!!\001"
 				puthelp "PRIVMSG $chan :!beer $nick"
