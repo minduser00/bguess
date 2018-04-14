@@ -538,6 +538,7 @@ proc check_duck {chan nick bghi bglo} {
 				}
 				puthelp "PRIVMSG $chan :\001ACTION -> $msg.\001"
 			}
+			bgnext $nick
 		} else {
 			# Se permite jugar el ultimo número
 		}
@@ -555,18 +556,18 @@ proc bgcan {chan nick} {
 			if {[string equal -nocase $bguess(last_winner) $nick]} {
 				# El ultimo ganador repite acierto
 				incr bguess(in_a_row)
-				if {$bguess(in_a_row) >= $bgrow_can} {
-					# Bote para el ganador
-					puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m-Te llevas el bote de $bguess(can) puntos.\001"
-					player_stats_update $nick 0 0 $bguess(can)
-					set bguess(in_a_row) 0
-					set bguess(can) 0
-				} elseif {$bguess(in_a_row) == [expr $bgrow_can - 1]} {
-					# Un acierto mas y nick se lleva el bote
-					puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Un acierto mas y el bote de $bguess(can) puntos es tuyo.\001"
-				}
 			} else {
 				set bguess(in_a_row) 1
+			}
+			if {$bguess(in_a_row) >= $bgrow_can} {
+				# Bote para el ganador
+				puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m-Te llevas el bote de $bguess(can) puntos.\001"
+				player_stats_update $nick 0 0 $bguess(can)
+				set bguess(in_a_row) 0
+				set bguess(can) 0
+			} elseif {$bguess(in_a_row) == [expr $bgrow_can - 1]} {
+				# Un acierto mas y nick se lleva el bote
+				puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Un acierto mas y el bote de $bguess(can) puntos es tuyo.\001"
 			}
 		}
 	}
