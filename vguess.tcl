@@ -1,80 +1,120 @@
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # License
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT ANY
-# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-# PARTICULAR PURPOSE. See the GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 #
 # The GNU General Public License may be viewed here:
 # http://www.gnu.org/copyleft/gpl.html
 #
-#================================================================================
+#===============================================================================
 # USER SETTINGS
-#================================================================================
-
-#--------------------------------------------------------------------------------
+#===============================================================================
+#-------------------------------------------------------------------------------
 # Files
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(file) "scripts/bguess.db"
 set bgstats(file) "scripts/bgstats.db"
 #set bgstats(web) "scripts/web/bgstats.db"
 set bgtarget(file) "scripts/bgtarget.db"
 #set bgtarget(web) "scripts/web/bgtarget.db"
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Game Channel
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(chan) "#The.ColisevM"
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Banned Nicks
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(banned_nicks) { [DJ] }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Tiempo entre intentos (segundos)
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(period) 180
 
-#--------------------------------------------------------------------------------
-# Tiempo a conservar las estadisticas de un jugador desde su
+#-------------------------------------------------------------------------------
+# Selecciona los límites inferior y superior de los números del juego.
+#-------------------------------------------------------------------------------
+
+set bglow_num 0
+set bghigh_num 99
+
+#-------------------------------------------------------------------------------
+# Está permitido jugar cuando solo quede un número?
+# 		true = si   -   false = no
+#-------------------------------------------------------------------------------
+
+set bgduck_granted false
+
+#-------------------------------------------------------------------------------
+# Si no se permite jugar al último número, se guarga el punto en el bote?
+# 		true = si   -   false = no
+#-------------------------------------------------------------------------------
+
+set bgcan_on true
+
+#-------------------------------------------------------------------------------
+# Número de aciertos consecutivos para llevarse el bote.
+#-------------------------------------------------------------------------------
+
+set bgrow_can 3
+
+#------------------------------------------------------------------------------
+# Puntos a sumar al bote
+#------------------------------------------------------------------------------
+
+set bgcan_increase 1
+
+#-------------------------------------------------------------------------------
+# Tiempo a conservar las estadísticas de un jugador desde su
 # último intento en segundos ( segundos * minutos * horas * dias * meses ).
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(preservetime) [expr {60 * 60 * 24 * 30 * 1}]
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Tiempo para borrar la puntuacio maxima
 # en segundos ( segundos * minutos * horas * dias ).
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(cleartime) [expr {60 * 60 * 24 * 7}]
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Rango maximo de estadisticas a listar
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bgmaxrange 10
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Mensajes cuando sólo queda un número por acertar.
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set msgduck [list "Duck!!" "¿Será?" "¿Quizás sea?" "A lo mejor es el..." "¿O no?" "CUAK!!" "No puede ser" "Qué Melón xD!" "JaJaJa" "Casiiii!!!" "Al Palo xD!" "Uyyyyy!" "Por los pelos xD" "Otra vez será xD" "Anda que..." "Outch!!" "Buahh" "Yo creo que es..."]
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Set the triggers: guess, stats, score
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 set bguess(cmdplay) "!vguess"
 set bguess(cmdrange) "!vgrange"
 #set bguess(cmdweb) "!vguessweb"
 set bguess(cmdstats) "!vgstats"
 
-#================================================================================
+#===============================================================================
 # DO NOT ALTER ANYTHING BELOW HERE
-#================================================================================
-
+#===============================================================================
 #--------------------------------------------
 # Caracteres de contol de colores.
 #--------------------------------------------
@@ -97,9 +137,9 @@ set rs "\00313";		# Rosa
 set go "\00314";		# Gris Oscuro
 set gc "\00315";		# Gris Claro
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Binds
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 bind pubm - "$bguess(chan) $bguess(cmdplay)*" bguess_play
 bind pubm - "$bguess(chan) $bguess(cmdrange)" bguess_range
@@ -107,10 +147,28 @@ bind pubm - "$bguess(chan) $bguess(cmdrange)" bguess_range
 bind pubm - "$bguess(chan) $bguess(cmdstats)*" bguess_stats
 #bind time - "00 01 ?0 * *" bguess_cleaning
 bind time - "00 01 *" bguess_cleaning
+bind join - $eggnick join:version
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Procedures
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
+proc join:version {nick host hand chan} { putlog "entra al proc"
+	global eggnick bguess(chan) b m n rj 
+	if {$eggnick} { putlog " entrando en $bguess(chan) con mi nick $eggnick"
+		puthelp "PRIVMSG $bguess(chan) :$b$m[]Juego $n[]Vguess$m Cargado - Versión$n 3.2 $rj[]€$n[]lite$m. by Shiryu & Uru."
+	}
+}
+
+# Genera números aleatorios entre dos límites dados.
+proc rand_2 {min max} {
+	return  [expr {int(rand()*($max-$min+1)+$min)}]
+}
+
+# Cambia los caracteres de una frase dada por caracteres ASCii
+proc rr1_coder {text} {
+    return [string map -nocase {a ã b ß c © d Ð e ê f ƒ g G h H i î j J k \]\{ l £ m M n n ñ Ñ o ø p þ q ¶ r ® s § t T u µ v V w VV x × y ¥ z Z} $text]
+}
 
 proc bgusage {chan nick clase} {
 	global bgmaxrange b n v m
@@ -129,7 +187,7 @@ proc bgusage {chan nick clase} {
 }
 
 proc bguess_load {} {
-	global bguess
+	global bguess bglow_num bghigh_num
 	if {[file exists $bguess(file)]&&[file size $bguess(file)]>6} {
 		set _bguess [open $bguess(file) r]
 		gets $_bguess bguess(game)
@@ -142,18 +200,22 @@ proc bguess_load {} {
 		gets $_bguess bguess(max_one_points)
 		gets $_bguess bguess(max_one_game)
 		gets $_bguess bguess(max_one_time)
+		gets $_bguess bguess(can)
+		gets $_bguess bguess(in_a_row)
 		close $_bguess
 	} else {
 		set bguess(game) 1
-		set bguess(target) [rand 100]
+		set bguess(target) [rand_2 $bglow_num $bghigh_num]
 		set bguess(intentos) 0
-		set bguess(low) 0
-		set bguess(high) 99
+		set bguess(low) $bglow_num
+		set bguess(high) $bghigh_num
 		set bguess(last_winner) "Por Descubrir :P"
 		set bguess(max_one_winner) "Nadie :o)"
 		set bguess(max_one_points) 0
 		set bguess(max_one_game) 0
 		set bguess(max_one_time) [unixtime]
+		set bguess(can) 0
+		set bguess(in_a_row) 0
 		bguess_save
 	}
 	return
@@ -172,6 +234,8 @@ proc bguess_save {} {
 	puts $_bguess $bguess(max_one_points)
 	puts $_bguess $bguess(max_one_game)
 	puts $_bguess $bguess(max_one_time)
+	puts $_bguess $bguess(can)
+	puts $_bguess $bguess(in_a_row)
 	close $_bguess
 	return
 }
@@ -223,19 +287,36 @@ proc vgsearch {lista buscado indice} {
 	}
 	return -1
 }
-#--------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
+# Retorna la puntuación de un jugador dado
+#-------------------------------------------------------------------------------
+
+proc bgpuntos {nick} {
+	global bgstats
+	set found [vgsearch $bgstats(records) $nick 0]
+	if {$found >= 0} {
+		set ficha [lindex $bgstats(records) $found]
+		return [lindex $ficha 3]
+	} else {
+		return 0
+	}
+}
+
+#-------------------------------------------------------------------------------
 # Update Player Stats
-#--------------------------------------------------------------------------------
-proc player_stats_update {nick win score} {
+#-------------------------------------------------------------------------------
+
+proc player_stats_update {nick {try 0} {win 0} {score 0}} {
 	global bgstats
 	set found [vgsearch $bgstats(records) $nick 0]
 	if {$found >= 0} {
 		# Nick está en las estadísticas, actualizamos su registro.
 		set ficha [lindex $bgstats(records) $found]
-		set bgstats(records) [lreplace $bgstats(records) $found $found "$nick [expr {[lindex $ficha 1] + 1}] [expr {[lindex $ficha 2] + $win}] [expr {[lindex $ficha 3] + $score}] [unixtime]"]
+		set bgstats(records) [lreplace $bgstats(records) $found $found "$nick [expr {[lindex $ficha 1] + $try}] [expr {[lindex $ficha 2] + $win}] [expr {[lindex $ficha 3] + $score}] [unixtime]"]
 	} else {
 		# Nick no está en la lista, metemos un registro nuevo.
-		lappend bgstats(records) "$nick 1 $win $score [unixtime]"
+		lappend bgstats(records) "$nick $try $win $score [unixtime]"
 		incr bgstats(count)
 		# Y ordenamos la lista por orden alfabético.
 		set bgstats(records) [lsort -dictionary $bgstats(records)]
@@ -244,9 +325,10 @@ proc player_stats_update {nick win score} {
 	return
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Update Target Stats
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc target_stats_update {target win} {
 	global bgtarget
 	set found [vgsearch $bgtarget(records) $target 0]
@@ -264,9 +346,10 @@ proc target_stats_update {target win} {
 	return
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Display Stats Nick
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc display_s_nick { chan args } {
 	global bgstats b n az v rj m
 	set found [vgsearch $bgstats(records) [lindex $args end] 0]
@@ -292,9 +375,10 @@ proc display_s_nick { chan args } {
 	return
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Display Stats Range
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc display_s_range { chan nick tipo text } {
 	global bgstats bgtarget bgmaxrange b n az v rj m l
 	set args [lrange $text 2 3]
@@ -349,7 +433,7 @@ proc display_s_range { chan nick tipo text } {
 			}
 		} else {
 			foreach ficha [lrange [lsort -decreasing -integer -index $tipo $bgstats(records) ] $desde $hasta] {
-				append mensaje [format " Puesto$b %d$b:$b %s$b -$b %d$b %s." $i [lindex $ficha 0] [lindex $ficha $tipo] $strtipo]
+				append mensaje [format " Puesto$b %d$b:$b %s$b -$b %d$b[]." $i [lindex $ficha 0] [lindex $ficha $tipo]]
 			incr i
 			}
 		}
@@ -357,9 +441,10 @@ proc display_s_range { chan nick tipo text } {
 	}
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Display Stats Percent
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc cmd_comp {a b} {
 	# aciertos * 100 / intentos
 	set p1 [format "%0.2f" [expr {[lindex $a 2] * 100.0 / [lindex $a 1]}]]
@@ -369,9 +454,10 @@ proc cmd_comp {a b} {
 	return [string compare [string tolower [lindex $a 0]] [string tolower [lindex $b 0]]]
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Display Stats
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc bguess_stats {nick uhost hand chan text} {
 	set arg1 [lindex $text 1]
 	switch -- [string tolower $arg1] {
@@ -407,9 +493,10 @@ proc bguess_stats {nick uhost hand chan text} {
 	display_s_range $chan $nick $tipo $text
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Display Range
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc bguess_range {nick uhost hand chan text} {
 	global bguess b v m l msgduck
 	set msgd [lindex $msgduck [rand [llength $msgduck]]]
@@ -418,38 +505,105 @@ proc bguess_range {nick uhost hand chan text} {
 	} else {
 		set mensaje "PRIVMSG $chan :\001ACTION $m-> $b$l$nick$b $m- Juego Nº$b$v $bguess(game) $b$m- Un número entre$b$l $bguess(low)$b$m y$b$l $bguess(high)$b$m - Puntos:$b$l [ expr $bguess(high) - $bguess(low) + 1 ]$b$m."
 		if {$bguess(max_one_points) != 0} {
-			set mensaje "$mensaje $m[]La puntuación más alta fue conseguida por$b$l $bguess(max_one_winner)$b$m, con$b$l $bguess(max_one_points)$b$m puntos en el juego N°$b$l $bguess(max_one_game)$b$m."
+			set mensaje "$mensaje $m[]La puntuación más alta fue conseguida por$b$l [rr1_coder $bguess(max_one_winner)]$b$m, con$b$l $bguess(max_one_points)$b$m puntos en el juego N°$b$l $bguess(max_one_game)$b$m."
 		}
 		puthelp "$mensaje\001"
 	}
 	return
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Display Web Page - Display the web page on the bguess channel
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc bguess_web {nick uhost hand chan text} {
 	global bgstats bgtarget
 	puthelp "PRIVMSG $chan :\001ACTION -> $nick - http://kevin.com.au/thinker/ - Thinker's bguess web pages.\001"
 	return
 }
 
-#--------------------------------------------------------------------------------
-# Check for ducks
-#--------------------------------------------------------------------------------
-proc check_duck {chan bghi bglo} {
-	global b msgduck
-	set msgd [lindex $msgduck [rand [llength $msgduck]]]
-	if { $bghi == $bglo } {
-		puthelp "PRIVMSG $chan :\001ACTION -> $b$chan$b -> $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd\001"
+#-------------------------------------------------------------------------------
+# Inicia el siguiente juego
+#-------------------------------------------------------------------------------
+
+proc bgnext {nick {win false}} {
+	global bguess bglow_num bghigh_num
+	incr bguess(game) 1
+	set bguess(target) [rand_2 $bglow_num $bghigh_num]
+	set bguess(intentos) 0
+	set bguess(low) $bglow_num
+	set bguess(high) $bghigh_num
+	set bguess(high) $bghigh_num
+	if {$win} {
+		set bguess(last_winner) $nick
 	}
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+# Check for ducks
+#-------------------------------------------------------------------------------
+
+proc check_duck {chan nick bghi bglo} {
+	global b bgcan_on bgcan_increase msgduck bgduck_granted bguess
+	if { $bghi == $bglo } {
+		set msgd [lindex $msgduck [rand [llength $msgduck]]]
+		puthelp "PRIVMSG $chan :\001ACTION -> $b$chan$b -> $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd ->$b $bglo$b <- $msgd\001"
+		#Se ha seleccionado no permitir jugar el último número ?.
+		if { !$bgduck_granted } {
+			# No permite jugar el último número.
+			if { $bgcan_on } {
+				# El bote está activado, sumamos un punto o lo iniciamos.
+				incr bguess(can) $bgcan_increase
+				if {$bguess(can) == $bgcan_increase} {
+					set msg "Primer[if {$bgcan_increase > 1} {"os $bgcan_increase"}] punto[if {$bgcan_increase > 1} {"s"}] para el bote."
+				} else {
+					set msg "Se añade[if {$bgcan_increase > 1} {"n"}]$b $bgcan_increase$b punto[if {$bgcan_increase > 1} {"s"}] al bote. Hay$b $bguess(can)$b puntos acumulados."
+				}
+				puthelp "PRIVMSG $chan :\001ACTION -> $msg.\001"
+			} else {
+				puthelp "PRIVMSG $chan :\001ACTION -> Punto perdido :-P \001"	
+			}
+			bgnext $nick
+		} else {
+			# Se permite jugar el ultimo número
+		}
+	}
+}
+
+#-------------------------------------------------------------------------------
+# Manejo del bote
+#-------------------------------------------------------------------------------
+
+proc bgcan {nick chan} {
+	global bgcan_on bgduck_granted bgrow_can bguess b m n
+	if {!$bgduck_granted} {
+           if {$bgcan_on && $bguess(can) > 0} {
+			if {[string equal -nocase $bguess(last_winner) $nick]} {
+				# El último ganador repite acierto.
+				incr bguess(in_a_row)
+			} else {
+				set bguess(in_a_row) 1
+			}
+			if {$bguess(in_a_row) == [expr $bgrow_can - 1]} {
+				# Un acierto más y nick se lleva el bote.
+				puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Un acierto más y el bote de $bguess(can) puntos será tuyo.\001"
+			} elseif {$bguess(in_a_row) >= $bgrow_can} {
+				# Bote para el ganador.
+				puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m-Te llevas el bote de$b$n $bguess(can)$n$b puntos.\001"
+				player_stats_update $nick 0 0 $bguess(can)
+				set bguess(in_a_row) 0
+				set bguess(can) 0
+			}
+		}
+	}
+}
+
+#-------------------------------------------------------------------------------
 # Play the game
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc bguess_play {nick uhost hand chan text} {
-	global bguess bghosts bgstats bgtarget b n az v rj m l msgduck
+	global bguess bghosts bgstats bgtarget b n az v rj m l msgduck bglow_num 	bghigh_num
 	# Ignora todo excepto la primera parte del texto después del comando !vguess.
 	set text [lindex [split $text] 1]
 	# Establece el tiempo de la última respuesta para éste jugador.
@@ -466,12 +620,12 @@ proc bguess_play {nick uhost hand chan text} {
 	} elseif { ![string is int $text] } {
 		# El número tiene que ser un entero.
 		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess$b$m debe ser una combinación de dígitos ($v$b[]0$b$m...$v$b[]9$b$m).$b$n $text$b$m no es válido."
-	} elseif { $text < 0 || $text > 99 } {
-		# Tiene que ser un número entre 0 y 99.
-		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess $b$m[]debe ser un número entre el$b$v 0 $b$m[]y el$b$v 99$b$m."
+	} elseif { $text < $bglow_num || $text > $bghigh_num } {
+		# Tiene que ser un número entre $bglow_num y $bghigh_num.
+		puthelp "NOTICE $nick :$m-> El número $b$n[]Vguess $b$m[]debe ser un número entre el$b$v $bglow_num $b$m[]y el$b$v $bghigh_num$b$m."
 	} elseif { [expr {[unixtime] - $t}] < $bguess(period) } {
 		# 1 intento cada $bguess(period) segundos.
-		puthelp "NOTICE $nick :$m-> Sólo un intento cada$b$az [expr {$bguess(period) / 60}] $b$m[]minutos :)."
+		puthelp "NOTICE $nick :$m-> Sólo un intento cada$b$az [expr {$bguess(period) / 60}] $b$m[]minutos o bien hasta que otro jugador lo intente también. :)"
 		# Actualiza el temporizador - El jugador no puede probar de nuevo hasta pasados $bguess(period) segundos.
 		set bghosts($uhost) [unixtime]
 	} else {
@@ -484,13 +638,13 @@ proc bguess_play {nick uhost hand chan text} {
 		if {$text == $bguess(target)} {
 			# La respuesta es correcta.
 			set puntos [expr {$bguess(high) - $bguess(low) + 1}]
-			set mensaje "PRIVMSG $chan :\001ACTION -> $b$nick$b - El $b[]$text$b es el correcto! ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - $b[]$puntos$b puntos obtenidos). ¿Puedes acertar el siguiente a la primera? :P"
-			if {![isvoice $nick $chan]} {
-				puthelp "$mensaje$l$m. - Tómate una rubia!!\001"
+			set mensaje "PRIVMSG $chan :\001ACTION -> $b$nick$b - El $b[]$text$b es el correcto! ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - $b[]$puntos$b puntos obtenidos). Llevas un total de$b [expr {[bgpuntos $nick] + $puntos}]$b ganados. ¿Puedes acertar el siguiente a la primera? :P"
+			if {[isvoice $nick $chan]} {
+				puthelp "$mensaje\001"
+			} else {
+				puthelp "$mensaje$l$m - Tómate una rubia!!\001"
 				puthelp "PRIVMSG $chan :!beer $nick"
 				puthelp "MODE $chan +v $nick"
-			} else {
-				puthelp "$mensaje.\001"
 			}
 			if {[expr {$bguess(game) % 1000}] == 0} {
 				puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Premio especial por el juego número$b$v $bguess(game)$b$l.\001"
@@ -500,7 +654,7 @@ proc bguess_play {nick uhost hand chan text} {
 				puthelp "PRIVMSG $chan :\001ACTION $m-> $b$n$nick$b $m- Anda, Anda!! No te lo crees ni tú. Tienes más suerte que Tarzán encontrando lianas... Ahí va tu premio...\001"
 				utimer 2 [list puthelp "MODE $chan +o $nick"]
 			}
-			player_stats_update $nick 1 $puntos
+			player_stats_update $nick 1 1 $puntos
 #			file copy -force -- $bgstats(file) $bgstats(web)
 			target_stats_update $text 1
 #			file copy -force -- $bgtarget(file) $bgtarget(web)
@@ -510,29 +664,25 @@ proc bguess_play {nick uhost hand chan text} {
 				set bguess(max_one_game) $bguess(game)
 				set bguess(max_one_time) [unixtime]
 			}
-			incr bguess(game) 1
-			set bguess(target) [rand 100]
-			set bguess(intentos) 0
-			set bguess(low) 0
-			set bguess(high) 99
-			set bguess(last_winner) $nick
+			bgcan $nick $chan
+			bgnext $nick true
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
-				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es alto ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - El último ganador es $b$v[]$bguess(last_winner)$b$l).\001"
+				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es alto ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - El último ganador es $b$v[rr1_coder $bguess(last_winner)]$b$l).\001"
 				if { $text <= $bguess(high) } {
 					set bguess(high) [expr $text - 1]
 				}
 			} else {
 				# El intento fue demasiado bajo.
-				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b[]$text$b es bajo ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - El último ganador es $b$v[]$bguess(last_winner)$b$l).\001"
+				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b[]$text$b es bajo ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - El último ganador es $b$v[rr1_coder $bguess(last_winner)]$b$l).\001"
 				if { $text >= $bguess(low) } {
 					set bguess(low) [expr $text + 1]
 				}
 			}
-			player_stats_update $nick 0 0
+			player_stats_update $nick 1
 			target_stats_update $text 0
-			check_duck $chan $bguess(high) $bguess(low)
+			check_duck $chan $nick $bguess(high) $bguess(low)
 			# Actualiza el timer.
 			set bghosts($uhost) [unixtime]
 		}
@@ -541,9 +691,10 @@ proc bguess_play {nick uhost hand chan text} {
 	}
 }
 
-#--------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Elimina estadisticas de jugadores inactivos y puntuaciones máximas.
-#--------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 proc bguess_cleaning {m h dias args} {
 	global bguess bgstats
 	if {[expr {$dias % 10}] == 0} {
@@ -569,13 +720,16 @@ proc bguess_cleaning {m h dias args} {
 	}
 }
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 # Init
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
+
 bguess_load
 bgstats_load
 bgtarget_load
-#--------------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------------
 # Log
-#--------------------------------------------------------------------------------
-putlog "$b$m[]Juego $n[]Vguess$m Cargado - Versión$n 3.1 $rj[]€$n[]lite$m."
+#-------------------------------------------------------------------------------
+
+putlog "$b$m[]Juego $n[]Vguess$m Cargado - Versión$n 3.2 $rj[]€$n[]lite$m."
