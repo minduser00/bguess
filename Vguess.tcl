@@ -157,7 +157,6 @@ bind join - "$bguess(chan) $botnick*" join_version
 proc join_version {nick host hand chan} {
 	global b m n rj 
 	if {[string equal -nocase $::botnick $nick]} {
-		putlog " entrando en $chan con mi nick $nick"
 		puthelp "PRIVMSG $chan :$b$m[]Juego $n[]Vguess$m Cargado -\
 			Versión$n 3.2 $rj[]€$n[]lite$m. by Shiryu & Uru."
 	}
@@ -398,7 +397,7 @@ proc display_s_range { chan nick tipo text } {
 				return
 			}
 		}
-		2 {
+		2 { # Se han pasado dos parametros, son numeros enteros los dos?
 			set desde [lindex $args 0]
 			set hasta [lindex $args 1]
 			if {[string is int $desde]&&[string is int $hasta]} {
@@ -453,7 +452,7 @@ proc cmd_comp {a b} {
 	set p2 [format "%0.2f" [expr {[lindex $b 2] * 100.0 / [lindex $b 1]}]]
 	if {$p1 < $p2} { return 1 }
 	if {$p1 > $p2} { return -1 }
-	return [string compare [string tolower [lindex $a 0]] [string tolower [lindex $b 0]]]
+	return [string compare -nocase [lindex $a 0] [lindex $b 0]]
 }
 
 #-------------------------------------------------------------------------------
@@ -520,7 +519,7 @@ proc bguess_range {nick uhost hand chan text} {
 
 proc bguess_web {nick uhost hand chan text} {
 	global bgstats bgtarget
-	puthelp "PRIVMSG $chan :\001ACTION -> $nick - http://kevin.com.au/thinker/ - Thinker's bguess web pages.\001"
+	puthelp "PRIVMSG $chan :\001ACTION -> $nick - http://unapagina.com/ - Página del juego Vguess.\001"
 	return
 }
 
@@ -671,13 +670,13 @@ proc bguess_play {nick uhost hand chan text} {
 		} else {
 			if {$text > $bguess(target)} {
 				# El intento fue demasiado alto.
-				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es alto ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - El último ganador es$b$v [rr1_coder $bguess(last_winner)]$b$l).\001"
+				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es alto ($b$bguess(intentos)$b intentos en juego Nº $b$bguess(game)$b - El último ganador es$b$v [rr1_coder $bguess(last_winner)]$b$l).\001"
 				if { $text <= $bguess(high) } {
 					set bguess(high) [expr $text - 1]
 				}
 			} else {
 				# El intento fue demasiado bajo.
-				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b[]$text$b es bajo ($b[]$bguess(intentos)$b intentos en juego Nº $b[]$bguess(game)$b - El último ganador es$b$v [rr1_coder $bguess(last_winner)]$b$l).\001"
+				puthelp "PRIVMSG $chan :\001ACTION -> $b$nick$b - $b$text$b es bajo ($b$bguess(intentos)$b intentos en juego Nº $b$bguess(game)$b - El último ganador es$b$v [rr1_coder $bguess(last_winner)]$b$l).\001"
 				if { $text >= $bguess(low) } {
 					set bguess(low) [expr $text + 1]
 				}
@@ -685,7 +684,7 @@ proc bguess_play {nick uhost hand chan text} {
 			player_stats_update $nick 1
 			target_stats_update $text 0
 			check_duck $chan $nick $bguess(high) $bguess(low)
-			# Actualiza el timer.
+			# Actualiza el timer para este usuario.
 			set bghosts($uhost) [unixtime]
 		}
 		# Guarda el timer.
