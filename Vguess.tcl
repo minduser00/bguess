@@ -116,6 +116,11 @@ set bguess(cmdstats) "!vgstats"
 # DO NOT ALTER ANYTHING BELOW HERE
 #===============================================================================
 #--------------------------------------------
+# Control de Versión.
+#--------------------------------------------
+set bgversion "3.9"; set bgrelease "BETA1";
+
+#--------------------------------------------
 # Caracteres de contol de colores.
 #--------------------------------------------
 set b "\002";		# Negritas
@@ -155,10 +160,10 @@ bind join - "$bguess(chan) $botnick*" join_version
 
 # Anuncio del bot al entrar al canal donde esta activo el juego
 proc join_version {nick host hand chan} {
-	global b m n rj 
+	global $bgversion b m n rj 
 	if {[string equal -nocase $::botnick $nick]} {
 		puthelp "PRIVMSG $chan :$b$m[]Juego $n[]Vguess$m Cargado -\
-			Versión$n 3.2 $rj[]€$n[]lite$m. by Shiryu & Uru."
+			Versión$n $bgversion $rj[]€$n[]lite$m. by Shiryu & Uru."
 	}
 }
 
@@ -733,4 +738,4 @@ bgtarget_load
 # Log
 #-------------------------------------------------------------------------------
 
-putlog "$b$m[]Juego $n[]Vguess$m Cargado - Versión$n 3.2 $rj[]€$n[]lite$m."
+putlog "$b$m[]Juego $n[]Vguess$m Cargado - Versión$n $bgversion $rj[]€$n[]lite$m."
