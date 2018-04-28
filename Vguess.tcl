@@ -159,7 +159,7 @@ proc join_version {nick host hand chan} {
 	if {[string equal -nocase $::botnick $nick]} {
 		putlog " entrando en $chan con mi nick $nick"
 		puthelp "PRIVMSG $chan :$b$m[]Juego $n[]Vguess$m Cargado -\
-		Versión$n 3.2 $rj[]€$n[]lite$m. by Shiryu & Uru."
+			Versión$n 3.2 $rj[]€$n[]lite$m. by Shiryu & Uru."
 	}
 }
 
