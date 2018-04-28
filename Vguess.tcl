@@ -130,12 +130,12 @@ set l "\0036";		# Lila
 set na "\0037";		# Naranja
 set am "\0038";		# Amarillo
 set vc "\0039";		# Verde Claro
-set tu "\00310";		# Turquesa
+set tu "\00310";	# Turquesa
 set c "\00311";		# Celeste
 set a "\00312";		# Azul
-set rs "\00313";		# Rosa
-set go "\00314";		# Gris Oscuro
-set gc "\00315";		# Gris Claro
+set rs "\00313";	# Rosa
+set go "\00314";	# Gris Oscuro
+set gc "\00315";	# Gris Claro
 
 #-------------------------------------------------------------------------------
 # Binds
@@ -280,10 +280,9 @@ proc bgtarget_load {} {
 }
 
 proc vgsearch {lista buscado indice} {
-	set buscado [string tolower $buscado]
 	set i 0
 	foreach ficha $lista {
-		if {$buscado == [string tolower [lindex $ficha $indice]]} {
+		if {[string equal -nocase $buscado [lindex $ficha $indice]]} {
 			return $i
 		}
 		incr i
@@ -365,8 +364,8 @@ proc display_s_nick { chan args } {
 			#En "$args" tenemos el nick que ha escrito el comando.
 			puthelp [format "PRIVMSG %s :$m->$b$v %s$b$m, Con$b$az %d$b$m Intentos,$b$rj %s$b$m[]Has Ganado$b$az %d$b$m Juegos Para Conseguir Un Total De$b$az %d$b$m Puntos. Tienes un porcentaje del$b %0.2f%%$b de punteria :P" $chan [lindex $args 0] $intentos [lindex $args 1] $aciertos $puntos [expr {$aciertos * 100.0 / $intentos}]]
 		} else {
-			#"$args" busca el record de otro jugador.
-				puthelp [format "PRIVMSG %s :$m->$b$v %s$b$m, Con$b$az %d$b$m Intentos,$b$rj %s$b$m Ha Ganado$b$az %d$b$m Juegos Para Conseguir Un Total De$b$az %d$b$m Puntos. Tiene un porcentaje del$b %0.2f%%$b de punteria :P" $chan [lindex $args 0] $intentos [lindex $args 1] $aciertos $puntos [expr {$aciertos * 100.0 / $intentos}]]
+			#[lindex $args 0] busca el record de otro jugador [lindex $args 1].
+			puthelp [format "PRIVMSG %s :$m->$b$v %s$b$m, Con$b$az %d$b$m Intentos,$b$rj %s$b$m Ha Ganado$b$az %d$b$m Juegos Para Conseguir Un Total De$b$az %d$b$m Puntos. Tiene un porcentaje del$b %0.2f%%$b de punteria :P" $chan [lindex $args 0] $intentos [lindex $args 1] $aciertos $puntos [expr {$aciertos * 100.0 / $intentos}]]
 		}
 	} else {
 		if {[llength $args] == 1} {
