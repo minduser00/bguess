@@ -160,7 +160,7 @@ bind join - "$bguess(chan) $botnick*" join_version
 
 # Anuncio del bot al entrar al canal donde esta activo el juego
 proc join_version {nick host hand chan} {
-	global $bgversion b m n rj 
+	global bgversion b m n rj 
 	if {[string equal -nocase $::botnick $nick]} {
 		puthelp "PRIVMSG $chan :$b$m[]Juego $n[]Vguess$m Cargado -\
 			Versión$n $bgversion $rj[]€$n[]lite$m. by Shiryu & Uru."
