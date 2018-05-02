@@ -190,7 +190,7 @@ proc bgbote {nick host hand chan text} {
 			putmsg $chan "$m-> $b$n$nick$b$m <- No hay ningún punto acumulado en el bote."
 		} else {
 			putmsg $chan "$m-> $b$n$nick$b$m <- Hay $n$b$bguess(can)$b$m punto[if {$bguess(can) > 1} {list s}]\
-				acumulado[if {$bguess(can) > 1} {list s}] en el bote."
+				acumulado[if {$bguess(can) > 1} {list s}] en el bote del juego Vguess."
 		}
 	} else {
 		putmsg $chan "$m-> $b$n$nick$b$m <- Actualmente el bote está desactivado."
