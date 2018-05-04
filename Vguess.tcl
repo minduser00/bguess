@@ -219,7 +219,7 @@ proc bgusage {chan nick clase} {
 	global bgmaxrange
 	switch $clase {
 		1 { # La ayuda de estadisticas
-			putnotc $nick [bold "\t\U  S  O :"]
+			putnotc $nick "\t[bold "U S O:"]"
 			utimer 1 [list putnotc $nick "\t[bold !vgstats][brown ": Muestra tus estadísticas en el juego."]"]
 			utimer 2 [list putnotc $nick "\t[bold !vgstats][brown " <[black [bold nick]]>: Muestra las estadísticas en el juego de un nick en concreto."]"]
 			utimer 3 [list putnotc $nick "\t[bold !vgstats][brown " \[[black [bold -a]]|[black [bold -i]]|[black [bold -p]]|[black [bold -r]]\]: Muestra las estadísticas de los tres primeros en Aciertos ([black [bold -a]]), Intentos ([black [bold -i]]), Puntos ([black [bold -p]]) o Porcentaje de Aciertos ([black [bold -r]]) respectivamente. Por ejemplo [black [bold "!vgstats -p"]] mostrará los tres primeros, clasificados por [black [bold P]]untuación."]"]
