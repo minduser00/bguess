@@ -15,6 +15,19 @@
 #-------------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------------
+#	Comprueba si colores.tcl está cargado y es la versión corecta
+#-------------------------------------------------------------------------------
+
+if {![info exists colores_lib_version]} {
+	putlog "\[VGUESS\]: Error; no se pudo encontrar colores.tcl"
+	return
+} elseif { $colores_lib_version < 100 } {
+	putlog "\[VGUESS\]: Error; se necesita la versión 100 o posterior\
+			de colores.tcl"
+	return
+}
+
+#-------------------------------------------------------------------------------
 #	Comprueba si alltools esta cargado y es la versión corecta
 #-------------------------------------------------------------------------------
 
@@ -29,6 +42,7 @@ if { !$alltools_loaded } {
 #===============================================================================
 # USER SETTINGS
 #===============================================================================
+
 #-------------------------------------------------------------------------------
 # Files
 #-------------------------------------------------------------------------------
@@ -132,7 +146,8 @@ set bguess(cmdstats) "!vgstats"
 #--------------------------------------------
 # Control de Versión.
 #--------------------------------------------
-set bgversion "3.9"; set bgrelease "BETA1";
+
+set bgversion "3.10"; set bgrelease "BETA1";
 
 #--------------------------------------------
 # Caracteres de contol de colores.
@@ -174,50 +189,42 @@ bind pub - !bote bgbote
 
 # Anuncio del bot al entrar al canal donde esta activo el juego.
 proc join_version {nick host hand chan} {
-	global bgversion b m n rj 
+	global bgversion 
 	if {[string equal -nocase $::botnick $nick]} {
-		putchan $chan "$b$m[]Juego $n[]Vguess$m Cargado -\
-			Versión$n $bgversion $rj[]€$n[]lite$m. by Shiryu & Uru."
+		putchan $chan [bold [brown "Juego [black Vguess] Cargado - Versión\
+			[black "$bgversion [lred "€"]lite"]. by Shiryu & Uru."]]
 	}
 }
 
 # Muestra en el canal los puntos acumulados en el bote usando el comando !bote
 proc bgbote {nick host hand chan text} {
-	global bgcan_on  bguess b n m
+	global bgcan_on  bguess
 	# El bote está activado.
 	if {$bgcan_on} {
 		if {$bguess(can) == 0} {
-			putmsg $chan "$m-> $b$n$nick$b$m <- No hay ningún punto acumulado en el bote."
+			putmsg $chan [brown "-> [black [bold $nick]] <- No\
+				hay ningún punto acumulado en el bote."]
 		} else {
-			putmsg $chan "$m-> $b$n$nick$b$m <- Hay $n$b$bguess(can)$b$m punto[if {$bguess(can) > 1} {list s}]\
-				acumulado[if {$bguess(can) > 1} {list s}] en el bote del juego Vguess."
+			putmsg $chan [brown "-> [black [bold $nick]] <- Hay [black [bold $bguess(can)]]\
+				punto[if {$bguess(can) > 1} {list s}] acumulado[if {$bguess(can) > 1}\
+				{list s}] en el bote del juego Vguess."]
 		}
 	} else {
-		putmsg $chan "$m-> $b$n$nick$b$m <- Actualmente el bote está desactivado."
-		utimer 2 [list putnotc $nick "\t$m\Habla con el/los administrador/es para consensuar su activación. Gracias."]
+		putmsg $chan [brown "-> [black [bold $nick]] <- Actualmente el bote está desactivado."]
+		utimer 2 [list putnotc $nick [brown "\t\Habla con el/los administrador/es para consensuar su activación. Gracias."]]
 	}
 }
 
-# Genera números aleatorios entre dos límites dados.
-proc rand_2 {min max} {
-	return  [expr {int(rand()*($max-$min+1)+$min)}]
-}
-
-# Cambia los caracteres de una frase dada por caracteres ASCii.
-proc rr1_coder {text} {
-    return [string map -nocase {a ã b ß c © d Ð e ê f ƒ g G h H i î j J k K l £ m M n n ñ Ñ o ø p þ q ¶ r ® s § t T u µ v V w VV x × y ¥ z Z} $text]
-}
-
 proc bgusage {chan nick clase} {
-	global bgmaxrange b n v m
+	global bgmaxrange
 	switch $clase {
 		1 { # La ayuda de estadisticas
-			putnotc $nick "\t$b[]U  S  O$b:"
-			utimer 1 [list putnotc $nick "\t$b!vgstats$b:$m Muestra tus estadísticas en el juego."]
-			utimer 2 [list putnotc $nick "\t$b!vgstats$b $m<$b$n[]nick$b$m>: Muestra las estadísticas en el juego de un nick en concreto."]
-			utimer 3 [list putnotc $nick "\t$b!vgstats$b $m\[$b$n-a$b$m|$b$n-i$b$m|$b$n-p$b$m|$b$n-r$b$m\]: Muestra las estadísticas de los tres primeros en Aciertos ($b$n-a$b$m), Intentos ($b$n-i$b$m), Puntos ($b$n-p$b$m) o Porcentaje de Aciertos ($b$n-r$b$m) respectivamente. Por ejemplo $b$n!vgstats -p $b$m[]mostrará los tres primeros, clasificados por $b$n[]P$b$m[]untuación."]
-			utimer 4 [list putnotc $nick "\t$b!vgstats$b $m\[$b$n-a$b$m|$b$n-i$b$m|$b$n-p$b$m|$b$n-r$b$m\] seguido de un número, muestra las estadísticas de los primeros clasificados hasta ese número si no es mayor de$b$n $bgmaxrange$b$m, en caso contrario mostrará los$b$n $bgmaxrange $b$m[]clasificados hasta tu número. Por ejemplo $b$n!vgstats -p 6 $b$m[]mostrará del primero al sexto, clasificados por $b$n[]P$b$m[]untuación."]
-			utimer 5 [list putnotc $nick "\t$b!vgstats$b $m\[$b$n-a$b$m|$b$n-i$b$m|$b$n-p$b$m|$b$n-r$b$m\] seguido de dos números, muestra un rango de clasificados desde el primer número hasta el segundo. Por ejemplo $b$n!vgstats -p 3 8 $b$m[]mostrará del tercero al octavo, clasificados por $b$n[]P$b$m[]untuación. :-)"]
+			putnotc $nick [bold "\t\U  S  O :"]
+			utimer 1 [list putnotc $nick "\t[bold !vgstats][brown ": Muestra tus estadísticas en el juego."]"]
+			utimer 2 [list putnotc $nick "\t[bold !vgstats][brown " <[black [bold nick]]>: Muestra las estadísticas en el juego de un nick en concreto."]"]
+			utimer 3 [list putnotc $nick "\t[bold !vgstats][brown " \[[black [bold -a]]|[black [bold -i]]|[black [bold -p]]|[black [bold -r]]\]: Muestra las estadísticas de los tres primeros en Aciertos ([black [bold -a]]), Intentos ([black [bold -i]]), Puntos ([black [bold -p]]) o Porcentaje de Aciertos ([black [bold -r]]) respectivamente. Por ejemplo [black [bold "!vgstats -p"]] mostrará los tres primeros, clasificados por [black [bold P]]untuación."]"]
+			utimer 4 [list putnotc $nick "\t[bold !vgstats][brown " \[[black [bold -a]]|[black [bold -i]]|[black [bold -p]]|[black [bold -r]]\] seguido de un número, muestra las estadísticas de los primeros clasificados hasta ese número si no es mayor de [black [bold $bgmaxrange]], en caso contrario mostrará los  [black [bold $bgmaxrange]] clasificados hasta tu número. Por ejemplo [black [bold "!vgstats -p 6]] mostrará del primero al sexto, clasificados por [black [bold P]]untuación."]"]
+			utimer 5 [list putnotc $nick "\t[bold !vgstats][brown " \[[black [bold -a]]|[black [bold -i]]|[black [bold -p]]|[black [bold -r]]\] seguido de dos números, muestra un rango de clasificados desde el primer número hasta el segundo. Por ejemplo [black [bold "!vgstats -p 3 8"]] mostrará del tercero al octavo, clasificados por [black [bold P]]untuación. :-)"]"]
 		}
 		2 { # para posibles ampliaciones de la ayuda
 		}
@@ -455,7 +462,7 @@ proc display_s_range { chan nick tipo text } {
 			}
 		}
 	}
-	incr desde -1; incr hasta -1
+	decr desde; decr hasta;		#decrementa desde y hasta en 1
 	if {$desde < 0} { set desde 0}
 	if {$hasta < 0} { set hasta 0}
 	if { [expr {$hasta - $desde}] >= $bgmaxrange} { set hasta [expr {$desde + $bgmaxrange - 1}]}
@@ -763,7 +770,7 @@ proc bguess_cleaning {m h dias args} {
 	if {[expr {$dias % 10}] == 0} {
 		set cambios 0
 		set fechalimite [expr {[unixtime] - $bguess(preservetime)}]
-		for {set i [expr {$bgstats(count) - 1}]} {$i >= 0} {incr i -1} {
+		for {set i [expr {$bgstats(count) - 1}]} {$i >= 0} {decr i} {
 			if {[lindex $bgstats(records) $i 4] < $fechalimite} {
 				set bgstats(records) [lreplace $bgstats(records) $i $i]
 				set cambios 1
