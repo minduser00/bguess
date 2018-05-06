@@ -410,7 +410,7 @@ proc display_s_nick { chan args } {
 			set tu ""
 		}
 		putmsg $chan [format [brown "-> [green [bold %s]], Con [blue [bold %d]] Intentos,\
-			[lred [bold %s]] Ha%s Ganado [blue [brown %d]] Juegos Para Conseguir Un Total De\
+			[lred [bold %s]] Ha%s Ganado [blue [bold %d]] Juegos Para Conseguir Un Total De\
 			[blue [bold %d]] Puntos. Tiene%s un porcentaje del [bold %0.2f%%] de punteria :P"]\
 			$nick $intentos [rr1_coder $nickb] $tu $aciertos $puntos $tu\
 			[expr {$aciertos * 100.0 / $intentos}]]
