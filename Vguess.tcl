@@ -138,6 +138,7 @@ set bguess(cmdplay) "!vguess"
 set bguess(cmdrange) "!vgrange"
 #set bguess(cmdweb) "!vguessweb"
 set bguess(cmdstats) "!vgstats"
+set bguess(cmdcan) "!bote"
 
 #===============================================================================
 # DO NOT ALTER ANYTHING BELOW HERE
@@ -179,9 +180,9 @@ bind pubm - "$bguess(chan) $bguess(cmdplay)*" bguess_play
 bind pubm - "$bguess(chan) $bguess(cmdrange)" bguess_range
 #bind pubm - "$bguess(chan) $bguess(cmdweb)" bguess_web
 bind pubm - "$bguess(chan) $bguess(cmdstats)*" bguess_stats
-bind time - "00 01 *" bguess_cleaning
+bind pubm - "$bguess(chan) $bguess(cmdcan)*" bgbote
 bind join - "$bguess(chan) $botnick*" join_version
-bind pub - !bote bgbote
+bind time - "00 01 *" bguess_cleaning
 
 #-------------------------------------------------------------------------------
 # Procedures
@@ -399,8 +400,7 @@ proc display_s_nick { chan args } {
 	set nick [lindex $args 0]
 	set found [vgsearch $bgstats(records) [lindex $args end] 0]
 	if {$found >= 0} {
-		set ficha [lindex $bgstats(records) $found]
-		lassign $ficha nickb intentos aciertos puntos
+		lassign [lindex $bgstats(records) $found] nickb intentos aciertos puntos
 		if {[llength $args] == 1 || [string equal -nocase $nick $nickb]} {
 			#En "$nick" tenemos el nick que ha escrito el comando.
 			# no ha escrito un nick o ha escrito el suyo
