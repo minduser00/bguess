@@ -395,33 +395,30 @@ proc target_stats_update {target win} {
 #-------------------------------------------------------------------------------
 
 proc display_s_nick { chan args } {
-	global bgstats b n az v rj m
+	global bgstats
+	set nick [lindex $args 0]
 	set found [vgsearch $bgstats(records) [lindex $args end] 0]
 	if {$found >= 0} {
 		set ficha [lindex $bgstats(records) $found]
-		set intentos [lindex $ficha 1]
-		set aciertos [lindex $ficha 2]
-		set puntos [lindex $ficha 3]
-		if {[llength $args] == 1} {
-			#En "$args" tenemos el nick que ha escrito el comando.
-			putmsg $chan [format "$m->$b$v %s$b$m, Con$b$az %d$b$m Intentos,$b$rj\
-				%s$b$m[]Has Ganado$b$az %d$b$m Juegos Para Conseguir Un Total De$b$az\
-				%d$b$m Puntos. Tienes un porcentaje del$b %0.2f%%$b de punteria :P"\
-				[lindex $args 0] $intentos [lindex $args 1] $aciertos $puntos\
-				[expr {$aciertos * 100.0 / $intentos}]]
+		lassign $ficha nickb intentos aciertos puntos
+		if {[llength $args] == 1 || [string equal -nocase $nick $nickb]} {
+			#En "$nick" tenemos el nick que ha escrito el comando.
+			# no ha escrito un nick o ha escrito el suyo
+			set nickb "";	set tu "s";
 		} else {
-			#[lindex $args 0] busca el record de otro jugador [lindex $args 1].
-			putmsg $chan [format "$m->$b$v %s$b$m, Con$b$az %d$b$m Intentos,$b$rj\
-				%s$b$m Ha Ganado$b$az %d$b$m Juegos Para Conseguir Un Total De$b$az\
-				%d$b$m Puntos. Tiene un porcentaje del$b %0.2f%%$b de punteria :P"\
-				[lindex $args 0] $intentos [rr1_coder [lindex $args 1]]\
-				$aciertos $puntos [expr {$aciertos * 100.0 / $intentos}]]
+			# nick busca el record de otro jugador nickb.
+			set tu ""
 		}
+		putmsg $chan [format [brown "-> [green [bold %s]], Con [blue [bold %d]] Intentos,\
+			[lred [bold %s]] Ha%s Ganado [blue [brown %d]] Juegos Para Conseguir Un Total De\
+			[blue [bold %d]] Puntos. Tiene%s un porcentaje del [bold %0.2f%%] de punteria :P"]\
+			$nick $intentos [rr1_coder $nickb] $tu $aciertos $puntos $tu\
+			[expr {$aciertos * 100.0 / $intentos}]]
 	} else {
 		if {[llength $args] == 1} {
-			putnotc $args "$m->$b$v $args$b$m, Aún No Tienes Estadísticas En El Juego. Empieza a Jugar y Diviértete (Escribe <$b$n!vgstats -h$b$m> Para Obtener Ayuda)."
+			putnotc $nick [brown "-> [green [bold $nick]], Aún No Tienes Estadísticas En El Juego. Empieza a Jugar y Diviértete (Escribe <[black [bold "!vgstats -h"]]> Para Obtener Ayuda)."]
 		} else {
-			putnotc [lindex $args 0] "$m->$b$rj [rr1_coder [lindex $args 1]]$b$m Aún No Tiene Estadísticas En El Juego."
+			putnotc $nick [brown "-> [lred [bold [rr1_coder [lindex $args 1]]]] Aún No Tiene Estadísticas En El Juego."]
 		}
 	}
 	return
@@ -444,7 +441,7 @@ proc display_s_range { chan nick tipo text } {
 				set hasta $args
 				set desde [expr {$hasta - $bgmaxrange + 1}]
 			} else {
-				putnotc $nick "$m-> $b$rj[]ERROR$b$m: Escribe <$b$n!vgstats -h$b$m> Para Obtener Ayuda."
+				putnotc $nick [brown "-> [lred [bold ERROR]]: Escribe <[black [bold "!vgstats -h"]]> Para Obtener Ayuda."]
 				return
 			}
 		}
@@ -457,7 +454,7 @@ proc display_s_range { chan nick tipo text } {
 					set hasta [lindex $args 0]
 				}
 			} else {
-				putnotc $nick "$m-> $b$rj[]ERROR$b$m: Escribe <$b$n!vgstats -h$b$m> Para Obtener Ayuda."
+				putnotc $nick [brown "-> [lred [bold ERROR]]: Escribe <[black [bold "!vgstats -h"]]> Para Obtener Ayuda."]
 				return
 			}
 		}
@@ -467,16 +464,15 @@ proc display_s_range { chan nick tipo text } {
 	if {$hasta < 0} { set hasta 0}
 	if { [expr {$hasta - $desde}] >= $bgmaxrange} { set hasta [expr {$desde + $bgmaxrange - 1}]}
 	if {$desde >= $bgstats(count) } {
-		putnotc $nick "$m-> No hay nadie en ese rango."
+		putnotc $nick [brown "-> No hay nadie en ese rango."]
 	} else {
-		set mensaje "Records de usuarios ordenados por "
 		switch -- $tipo {
 			1 {set strtipo "intentos"}
 			2 {set strtipo "aciertos"}
 			3 {set strtipo "puntos"}
 			4 {set strtipo "porcentaje de aciertos"}
 		}
-		append mensaje "$b$strtipo$b."
+		set mensaje "Records de usuarios ordenados por [bold $strtipo]."
 		set i [expr {$desde + 1}]
 		if {$tipo == 4} {
 			foreach ficha [lrange [lsort -command cmd_comp $bgstats(records) ] $desde $hasta ] {
