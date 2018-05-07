@@ -211,9 +211,9 @@ proc bgusage {chan nick clase} {
 		}
 		2 { # La ayuda del juego
 			putnotc $nick "\t[bold "U S O:"]"
-			utimer 1 [list putnotc $nick [brown "-> Para jugar escribe [black [bold !vguess]]\
+			utimer 1 [list putnotc $nick "\t[brown "-> Para jugar escribe [black [bold !vguess]]\
 				<[black [bold número]]> (ej.: [black [bold "!vguess 50"]] - Elige\
-				un número entre el [green [bold $bglow_num]] y el [green [bold $bghigh_num]])."]]
+				un número entre el [green [bold $bglow_num]] y el [green [bold $bghigh_num]])."]"]
 		}
 	}
 }
@@ -603,8 +603,8 @@ proc check_duck {chan nick bghi bglo} {
 		for {set i 1} {$i < 5} {incr i} {
 			set msgd$i [lindex $msgduck [rand [llength $msgduck]]]
 		}
-		putact $chan "-> [bold $chan] -> $msgd -> [bold $bglo] <- $msgd\
-			-> [bold $bglo] <- $msgd -> [bold $bglo] <- $msgd"
+		putact $chan "-> [bold $chan] -> $msgd1 -> [bold $bglo] <- $msgd2\
+			-> [bold $bglo] <- $msgd3 -> [bold $bglo] <- $msgd4"
 		#Se ha seleccionado no permitir jugar el último número ?.
 		if { !$bgduck_granted } {
 			# No permite jugar el último número.
