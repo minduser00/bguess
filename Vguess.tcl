@@ -199,7 +199,6 @@ proc bgbote {nick host hand chan text} {
 
 proc bgusage {chan nick clase} {
 	global bgmaxrange bglow_num bghigh_num
-
 	switch $clase {
 		1 { # La ayuda de estadisticas
 			putnotc $nick "\t[bold "U S O:"]"
