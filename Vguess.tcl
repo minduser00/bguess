@@ -656,7 +656,7 @@ proc bgcan {nick chan} {
 			} elseif {$bguess(in_a_row) >= $bgrow_can} {
 				# Bote para el ganador.
 				putact $chan [brown "-> [black [bold $nick]] - Felicidades!! Has\
-					ganado [black [bold $bguess(in_a_row)] juegos de forma\
+					ganado [black [bold $bguess(in_a_row)]] juegos de forma\
 					consecutiva. Te llevas el bote de [black [bold $bguess(can)]]\
 					punto[if {$bguess(can) > 1} {list s}]."]
 				player_stats_update $nick 0 0 $bguess(can)
