@@ -545,7 +545,7 @@ proc bguess_stats {nick uhost hand chan text} {
 
 proc bguess_range {nick uhost hand chan text} {
 	global bguess msgduck
-	if { [expr {$text ne $bguess(cmdrange)}] } {
+	if { ![string equal -nocase $text $bguess(cmdrange)] } {
 		putnotc $nick "\t[bold "U S O:"]"
 		utimer 1 [list putnotc $nick "\t[brown "-> Para mostrar el rango de los\
 			números que faltan por salir, usa [black [bold "!vgrange"]] a secas."]"] 
