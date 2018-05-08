@@ -158,7 +158,7 @@ set bgversion "4.0"; set bgrelease "BETA1";
 #-------------------------------------------------------------------------------
 
 bind pubm - "$bguess(chan) $bguess(cmdplay)*" bguess_play
-bind pubm - "$bguess(chan) $bguess(cmdrange)" bguess_range
+bind pubm - "$bguess(chan) $bguess(cmdrange)*" bguess_range
 #bind pubm - "$bguess(chan) $bguess(cmdweb)" bguess_web
 bind pubm - "$bguess(chan) $bguess(cmdstats)*" bguess_stats
 bind pubm - "$bguess(chan) $bguess(cmdcan)*" bgbote
@@ -545,8 +545,12 @@ proc bguess_stats {nick uhost hand chan text} {
 
 proc bguess_range {nick uhost hand chan text} {
 	global bguess msgduck
-	set msgd [lindex $msgduck [rand [llength $msgduck]]]
-	if { $bguess(low) == $bguess(high) } {
+	if { [expr {$text ne $bguess(cmdrange)}] } {
+		putnotc $nick "\t[bold "U S O:"]"
+		utimer 1 [list putnotc $nick "\t[brown "-> Para mostrar el rango de los\
+			números que faltan por salir, usa [black [bold "!vgrange"]] a secas."]"] 
+	} elseif { $bguess(low) == $bguess(high) } {
+		set msgd [lindex $msgduck [rand [llength $msgduck]]]
 		putact $chan "-> [bold $chan] -> $msgd -> [bold $bguess(low)] <- $msgd\
 			-> [bold $bguess(low)] <- $msgd -> [bold $bguess(low)] <- $msgd"
 	} else {
