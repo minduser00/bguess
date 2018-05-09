@@ -815,4 +815,4 @@ bgtarget_load
 #-------------------------------------------------------------------------------
 
 putlog [bold [brown "Juego [black Vguess] Cargado - Versión\
-	[black "$bgversion [lred €]lite"]."]]
+	[black "$bgversion [lred €]lite"]." -nc]]
