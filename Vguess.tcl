@@ -399,10 +399,10 @@ proc display_s_nick { chan args } {
 			set tu ""
 		}
 		putmsg $chan [format [brown "-> [green [bold %s]], Con [blue [bold %d]] Intentos,\
-			[lred [bold %s]] Ha%s Ganado [blue [bold %d]] Juegos Para Conseguir Un Total De\
-			[blue [bold %d]] Puntos. Tiene%s un porcentaje del [bold %0.2f%%] de punteria :P" -nc]\
-			$nick $intentos [rr1_coder $nickb] $tu $aciertos $puntos $tu\
-			[expr {$aciertos * 100.0 / $intentos}]]
+			[lred [bold %s]] Ha%s Ganado [blue [bold %d]] Juego%s Para Conseguir Un Total\
+			De [blue [bold %d]] Punto%s. Tiene%s un porcentaje del [bold %0.2f%%] de punteria\
+			:P" -nc] $nick $intentos [rr1_coder $nickb] $tu $aciertos [if {$aciertos > 1} {list s}]\
+			$puntos [if {$puntos > 1} {list s}] $tu [expr {$aciertos * 100.0 / $intentos}]]
 	} else {
 		if {[llength $args] == 1} {
 			putnotc $nick [brown "-> [green [bold $nick]], Aún No Tienes\
